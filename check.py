@@ -1,4 +1,3 @@
-# run await update_vtb_list() regularly
 import asyncio
 import json
 import os
@@ -12,7 +11,6 @@ import urllib.request
 
 HOME = os.path.expanduser('~')
 bilibili_cookie = None
-vtb_list_path = "vtb_list.json"
 
 def wget(url, cookies=None):
     req = urllib.request.Request(url=url)
@@ -20,32 +18,6 @@ def wget(url, cookies=None):
         req.add_header('cookie', cookies)
     with urllib.request.urlopen(req) as f:
         return f.read().decode('utf-8')
-
-
-async def update_vtb_list():
-    msg = "成分姬：自动更新vtb列表失败"
-    vtb_list = load_vtb_list()
-    urls = [
-        "https://api.vtbs.moe/v1/short",
-        "https://api.tokyo.vtbs.moe/v1/short",
-        "https://vtbs.musedash.moe/v1/short",
-    ]
-    print('updating vtb list')
-    for url in urls:
-        try:
-            resp = wget(url)
-            result = json.loads(resp)
-            if not result:
-                continue
-            vtb_list += result
-            uid_list = list(set((info["mid"] for info in vtb_list)))
-            vtb_list = list(filter(lambda info: info["mid"] in uid_list, vtb_list))
-            break
-        except:
-            print(f"Get {url} timeout")
-    dump_vtb_list(vtb_list)
-    msg = "成分姬：自动更新vtb列表成功"
-    return msg
 
 
 def load_vtb_list(): # -> List[dict]:
@@ -69,12 +41,6 @@ def dump_vtb_list(vtb_list: List[dict]):
     )
     fp.close()
 
-
-async def get_vtb_list() -> List[dict]:
-    vtb_list = load_vtb_list()
-    if not vtb_list:
-        await update_vtb_list()
-    return load_vtb_list()
 
 
 async def get_uid_by_name(name: str) -> int:
@@ -147,7 +113,7 @@ async def get_reply(name: str): # -> Union[str, bytes]:
     if not user_info:
         return "获取用户信息失败，请检查名称或稍后再试"
 
-    vtb_list = await get_vtb_list()
+    vtb_list = load_vtb_list()
     if not vtb_list:
         return "获取vtb列表失败，请稍后再试"
 
