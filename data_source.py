@@ -13,10 +13,8 @@ import jinja2
 from nonebot.log import logger
 from .htmlrender import html_to_pic
 
-with open('./hoshino/modules/hoshinobot-plugin-ddcheck/config.json','r', encoding='UTF-8') as json_data_file:
-    config = json.load(json_data_file)
 
-bilibili_cookie = config['cookie']
+bilibili_cookie = '<NONE>'
 data_path = Path("data/ddcheck")
 vtb_list_path = data_path / "vtb_list.json"
 
@@ -145,7 +143,7 @@ def format_vtb_info(info: dict, medal_dict: dict) -> dict:
     return {"name": name, "uid": uid, "medal": medal}
 
 
-async def get_reply(name: str) -> Union[str, bytes]:
+async def get_reply(name: str): # -> Union[str, bytes]:
     if name.isdigit():
         uid = int(name)
     else:
