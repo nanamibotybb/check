@@ -9,11 +9,7 @@ forked from hoshinobot-plugin-ddcheck (Hoshinobot 成分姬插件)
 VTB列表数据来源：[vtbs.moe](https://vtbs.moe/)
 
 
-若要显示主播牌子，需要在 `.config.json` 文件中添加任意的B站用户cookie：
-
-```
-"cookie" = "xxx"
-```
+若要显示主播牌子，需要添加B站用户cookie.
 
 ### 示例
 
