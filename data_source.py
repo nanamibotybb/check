@@ -1,23 +1,16 @@
 # run await update_vtb_list() regularly
+import asyncio
 import json
 import httpx
 from pathlib import Path
 from typing import List, Union
-from nonebot.log import logger
-#from nonebot_plugin_apscheduler import scheduler
-#from nonebot_plugin_htmlrender import html_to_pic
 
 from pathlib import Path
 
-import jinja2
-from nonebot.log import logger
-from .htmlrender import html_to_pic
 
 
 bilibili_cookie = '<NONE>'
-data_path = Path("data/ddcheck")
-vtb_list_path = data_path / "vtb_list.json"
-
+vtb_list_path = "vtb_list.json"
 
 
 async def update_vtb_list():
@@ -28,6 +21,7 @@ async def update_vtb_list():
         "https://api.tokyo.vtbs.moe/v1/short",
         "https://vtbs.musedash.moe/v1/short",
     ]
+    print('updating vtb list')
     async with httpx.AsyncClient() as client:
         for url in urls:
             try:
@@ -40,7 +34,7 @@ async def update_vtb_list():
                 vtb_list = list(filter(lambda info: info["mid"] in uid_list, vtb_list))
                 break
             except httpx.TimeoutException:
-                logger.warning(f"Get {url} timeout")
+                print(f"Get {url} timeout")
     dump_vtb_list(vtb_list)
     msg = "成分姬：自动更新vtb列表成功"
     return msg
@@ -58,14 +52,13 @@ def load_vtb_list() -> List[dict]:
 
 
 def dump_vtb_list(vtb_list: List[dict]):
-    data_path.mkdir(parents=True, exist_ok=True)
-    json.dump(
-        vtb_list,
-        vtb_list_path.open("w", encoding="utf-8"),
+    fp = vtb_list_path.open("w");
+    json.dump(vtb_list, fp, encoding="utf-8",
         indent=4,
         separators=(",", ": "),
         ensure_ascii=False,
     )
+    fp.close()
 
 
 async def get_vtb_list() -> List[dict]:
@@ -176,3 +169,6 @@ async def get_reply(name: str): # -> Union[str, bytes]:
     content = await template.render_async(info=result)
     return await html_to_pic(content, wait=0, viewport={"width": 100, "height": 100})
 
+
+if __name__ == '__main__':
+    asyncio.run(update_vtb_list())
