@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 
-bilibili_cookie = '<NONE>'
+bilibili_cookie = None
 vtb_list_path = "vtb_list.json"
 
 
@@ -100,6 +100,9 @@ async def get_user_info(uid: int) -> dict:
 
 
 async def get_medals(uid: int) -> List[dict]:
+    if not bilibili_cookie:
+        return []
+
     try:
         url = "https://api.live.bilibili.com/xlive/web-ucenter/user/MedalWall"
         params = {"target_id": uid}
@@ -153,4 +156,10 @@ async def get_reply(name: str): # -> Union[str, bytes]:
 
 if __name__ == '__main__':
     # asyncio.run(update_vtb_list())
+
+    p = Path('~/etc/bilibili-cookies')
+    if p.exists():
+            with p.open('r') as f:
+                    bilibili_cookie = f.read()
+
     print(asyncio.run(get_reply(sys.argv[1])))
