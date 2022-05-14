@@ -173,8 +173,9 @@ async def get_reply(name: str): # -> Union[str, bytes]:
         "vtbs": vtbs,
     }
 
-    s = '{} (fans {}, follows {})\n'.format(res['name'],res['fans'], res['follows'])
-    s += ' '.join(sorted([i['name'] + ((' (' + str(i['medal'] + ') ')) if i['medal'] else '') for i in res['vtbs']]))
+    s = 'check/' + res['name'] + '\n'
+    s += '-----------------------------\n'
+    s += '\n'.join(sorted([i['name'] + ((' (' + str(i['medal'] + ') ')) if i['medal'] else '') for i in res['vtbs']]))
     return s
 
 
