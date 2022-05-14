@@ -3,9 +3,9 @@ import asyncio
 import json
 import os
 import httpx
+import sys
 from pathlib import Path
 from typing import List, Union
-
 from pathlib import Path
 
 
@@ -41,7 +41,7 @@ async def update_vtb_list():
     return msg
 
 
-def load_vtb_list() -> List[dict]:
+def load_vtb_list(): # -> List[dict]:
     if Path(vtb_list_path).exists():
         with open(vtb_list_path,
                         "r", encoding="utf-8") as f:
@@ -82,7 +82,7 @@ async def get_uid_by_name(name: str) -> int:
                 return user["mid"]
         return 0
     except (KeyError, IndexError, httpx.TimeoutException) as e:
-        logger.warning(f"Error in get_uid_by_name({name}): {e}")
+        print(f"Error in get_uid_by_name({name}): {e}")
         return 0
 
 
@@ -95,7 +95,7 @@ async def get_user_info(uid: int) -> dict:
             result = resp.json()
         return result["card"]
     except (KeyError, IndexError, httpx.TimeoutException) as e:
-        logger.warning(f"Error in get_user_info({uid}): {e}")
+        print(f"Error in get_user_info({uid}): {e}")
         return {}
 
 
@@ -109,7 +109,7 @@ async def get_medals(uid: int) -> List[dict]:
             result = resp.json()
         return result["data"]["list"]
     except (KeyError, IndexError, httpx.TimeoutException) as e:
-        logger.warning(f"Error in get_medals({uid}): {e}")
+        print(f"Error in get_medals({uid}): {e}")
         return []
 
 
@@ -167,10 +167,9 @@ async def get_reply(name: str): # -> Union[str, bytes]:
         "percent": f"{percent:.2f}% ({vtbs_num}/{follows_num})",
         "vtbs": vtbs,
     }
-    template = env.get_template("info.html")
-    content = await template.render_async(info=result)
-    return await html_to_pic(content, wait=0, viewport={"width": 100, "height": 100})
+    return result
 
 
 if __name__ == '__main__':
-    asyncio.run(update_vtb_list())
+    # asyncio.run(update_vtb_list())
+    print(asyncio.run(get_reply(sys.argv[1])))
