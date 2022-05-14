@@ -117,6 +117,22 @@ async def get_medals(uid: int) -> List[dict]:
 
 
 
+def format_vtb_info(info: dict, medal_dict: dict) -> dict:
+    name = info["uname"]
+    uid = info["mid"]
+    medal = {}
+    if name in medal_dict:
+        medal_info = medal_dict[name]["medal_info"]
+        medal = {
+            "name": medal_info["medal_name"],
+            "level": medal_info["level"],
+            "color_border": f"#{color:06X}",
+            "color_start": ff"#{color:06X}"
+            "color_end": f"#{color:06X}"
+        }
+    return {"name": name, "uid": uid, "medal": medal}
+
+
 async def get_reply(name: str): # -> Union[str, bytes]:
     if name.isdigit():
         uid = int(name)
