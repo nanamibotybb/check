@@ -12,7 +12,6 @@ import urllib.request
 bilibili_cookie = None
 vtb_list_path = "vtb_list.json"
 
-
 def wget(url, cookies=None):
     req = urllib.request.Request(url=url)
     if cookies:
