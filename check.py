@@ -9,8 +9,10 @@ from pathlib import Path
 import urllib.parse
 import urllib.request
 
-HOME = os.path.expanduser('~')
 bilibili_cookie = None
+
+
+vtb_list_path = "vtb_list.json"
 
 def wget(url, cookies=None):
     req = urllib.request.Request(url=url)
@@ -153,9 +155,9 @@ if __name__ == '__main__':
             with p.open('r') as f:
                     bilibili_cookie = f.read()
 
-    p = Path(vtb_list_path)
+    HOME = os.path.expanduser('~')
     if not p.exists():
-            vtb_list_path = HOME + '/check/' + vtb_list_path
+        vtb_list_path = HOME + '/check/' + vtb_list_path
 
     try:
         print(asyncio.run(get_reply(sys.argv[1])))
