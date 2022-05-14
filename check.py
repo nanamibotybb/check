@@ -9,7 +9,6 @@ from typing import List, Union
 from pathlib import Path
 
 
-
 bilibili_cookie = None
 vtb_list_path = "vtb_list.json"
 
