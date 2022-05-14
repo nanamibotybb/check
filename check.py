@@ -156,6 +156,7 @@ if __name__ == '__main__':
                     bilibili_cookie = f.read()
 
     HOME = os.path.expanduser('~')
+    p = Path(vtb_list_path)
     if not p.exists():
         vtb_list_path = HOME + '/check/' + vtb_list_path
 
