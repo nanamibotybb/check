@@ -2,6 +2,7 @@
 import asyncio
 import json
 import os
+import os.path
 import sys
 from pathlib import Path
 from typing import List, Union
@@ -9,6 +10,7 @@ from pathlib import Path
 import urllib.parse
 import urllib.request
 
+HOME = os.path.expanduser('~')
 bilibili_cookie = None
 vtb_list_path = "vtb_list.json"
 
@@ -181,4 +183,11 @@ if __name__ == '__main__':
             with p.open('r') as f:
                     bilibili_cookie = f.read()
 
-    print(asyncio.run(get_reply(sys.argv[1])))
+    p = Path(vtb_list_path)
+    if not p.exists():
+            vtb_list_path = HOME + '/check/' + vtb_list_path
+
+    try:
+        print(asyncio.run(get_reply(sys.argv[1])))
+    except:
+        print(asyncio.get_event_loop().run_until_complete(get_reply(sys.argv[1])))
