@@ -172,7 +172,7 @@ async def get_reply(name: str): # -> Union[str, bytes]:
         "percent": f"{percent:.2f}% ({vtbs_num}/{follows_num})",
         "vtbs": vtbs,
     }
-    return result
+    return json.dumps(result)
 
 
 if __name__ == '__main__':
