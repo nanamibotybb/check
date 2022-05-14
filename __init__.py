@@ -1,7 +1,6 @@
 from encodings import utf_8_sig
 from io import BytesIO
 import traceback
-import hoshino
 from loguru import logger
 from nonebot import on_command
 from hoshino.util import FreqLimiter, DailyNumberLimiter
@@ -19,6 +18,4 @@ from .data_source import get_reply,update_vtb_list
         
 async def scheduled_job1():
     msg = await update_vtb_list()
-    bot = hoshino.get_bot()
-    superid = hoshino.config.SUPERUSERS[0]
     await bot.send_private_msg(user_id=superid, message=msg)

@@ -1,3 +1,5 @@
+# run await update_vtb_list() regularly
+
 import json
 import httpx
 import jinja2
