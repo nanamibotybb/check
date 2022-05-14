@@ -2,15 +2,23 @@
 import asyncio
 import json
 import os
-import httpx
 import sys
 from pathlib import Path
 from typing import List, Union
 from pathlib import Path
-
+import urllib.parse
+import urllib.request
 
 bilibili_cookie = None
 vtb_list_path = "vtb_list.json"
+
+
+def wget(url, cookies=None):
+    req = urllib.request.Request(url=url)
+    if cookies:
+        req.add_header('cookie', cookies)
+    with urllib.request.urlopen(req) as f:
+        return f.read().decode('utf-8')
 
 
 async def update_vtb_list():
@@ -22,19 +30,18 @@ async def update_vtb_list():
         "https://vtbs.musedash.moe/v1/short",
     ]
     print('updating vtb list')
-    async with httpx.AsyncClient() as client:
-        for url in urls:
-            try:
-                resp = await client.get(url, timeout=10)
-                result = resp.json()
-                if not result:
-                    continue
-                vtb_list += result
-                uid_list = list(set((info["mid"] for info in vtb_list)))
-                vtb_list = list(filter(lambda info: info["mid"] in uid_list, vtb_list))
-                break
-            except httpx.TimeoutException:
-                print(f"Get {url} timeout")
+    for url in urls:
+        try:
+            resp = wget(url)
+            result = json.loads(resp)
+            if not result:
+                continue
+            vtb_list += result
+            uid_list = list(set((info["mid"] for info in vtb_list)))
+            vtb_list = list(filter(lambda info: info["mid"] in uid_list, vtb_list))
+            break
+        except:
+            print(f"Get {url} timeout")
     dump_vtb_list(vtb_list)
     msg = "成分姬：自动更新vtb列表成功"
     return msg
@@ -72,15 +79,15 @@ async def get_vtb_list() -> List[dict]:
 async def get_uid_by_name(name: str) -> int:
     try:
         url = "http://api.bilibili.com/x/web-interface/search/type"
-        params = {"search_type": "bili_user", "keyword": name}
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(url, params=params, timeout=10)
-            result = resp.json()
+        params = urllib.parse.urlencode({"search_type": "bili_user", "keyword": name})
+            
+        resp = wget(url + '?' + params)
+        result = json.loads(resp)
         for user in result["data"]["result"]:
             if user["uname"] == name:
                 return user["mid"]
         return 0
-    except (KeyError, IndexError, httpx.TimeoutException) as e:
+    except Exception as e:
         print(f"Error in get_uid_by_name({name}): {e}")
         return 0
 
@@ -88,12 +95,11 @@ async def get_uid_by_name(name: str) -> int:
 async def get_user_info(uid: int) -> dict:
     try:
         url = "https://account.bilibili.com/api/member/getCardByMid"
-        params = {"mid": uid}
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(url, params=params, timeout=10)
-            result = resp.json()
+        params = urllib.parse.urlencode({"mid": uid})
+        resp = wget(url + '?' + params)
+        result = json.loads(resp)
         return result["card"]
-    except (KeyError, IndexError, httpx.TimeoutException) as e:
+    except Exception as e:
         print(f"Error in get_user_info({uid}): {e}")
         return {}
 
@@ -104,13 +110,12 @@ async def get_medals(uid: int) -> List[dict]:
 
     try:
         url = "https://api.live.bilibili.com/xlive/web-ucenter/user/MedalWall"
-        params = {"target_id": uid}
-        headers = {"cookie": bilibili_cookie}
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(url, params=params, headers=headers)
-            result = resp.json()
+        params = urllib.parse.urlencode({"target_id": uid})
+        resp = wget(url + '?' + params,
+                        bilibili_cookie)
+        result = json.loads(resp)
         return result["data"]["list"]
-    except (KeyError, IndexError, httpx.TimeoutException) as e:
+    except Exception as e:
         print(f"Error in get_medals({uid}): {e}")
         return []
 
