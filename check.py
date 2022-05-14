@@ -163,7 +163,7 @@ async def get_reply(name: str): # -> Union[str, bytes]:
     follows_num = int(user_info["attention"])
     vtbs_num = len(vtbs)
     percent = vtbs_num / follows_num * 100 if follows_num else 0
-    result = {
+    res = {
         "name": user_info["name"],
         "uid": user_info["mid"],
         "face": user_info["face"],
@@ -172,7 +172,10 @@ async def get_reply(name: str): # -> Union[str, bytes]:
         "percent": f"{percent:.2f}% ({vtbs_num}/{follows_num})",
         "vtbs": vtbs,
     }
-    return json.dumps(result)
+
+    s = '{} (fans {}, follows {})\n'.format(res['name'],res['fans'], res['follows'])
+    s += ' '.join(sorted([i['name'] + ((' (' + str(i['medal'] + ') ')) if i['medal'] else '') for i in res['vtbs']]))
+    return s
 
 
 if __name__ == '__main__':
