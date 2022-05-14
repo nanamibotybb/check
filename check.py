@@ -127,7 +127,7 @@ def format_vtb_info(info: dict, medal_dict: dict) -> dict:
             "name": medal_info["medal_name"],
             "level": medal_info["level"],
             "color_border": f"#{color:06X}",
-            "color_start": ff"#{color:06X}",
+            "color_start": f"#{color:06X}",
             "color_end": f"#{color:06X}"
         }
     return {"name": name, "uid": uid, "medal": medal}
