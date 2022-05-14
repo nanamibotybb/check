@@ -1,8 +1,6 @@
 # run await update_vtb_list() regularly
-
 import json
 import httpx
-import jinja2
 from pathlib import Path
 from typing import List, Union
 from nonebot.log import logger
@@ -20,11 +18,6 @@ bilibili_cookie = '<NONE>'
 data_path = Path("data/ddcheck")
 vtb_list_path = data_path / "vtb_list.json"
 
-dir_path = Path(__file__).parent
-template_path = dir_path / "template"
-env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(template_path), enable_async=True
-)
 
 
 async def update_vtb_list():
