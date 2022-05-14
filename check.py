@@ -1,6 +1,7 @@
 # run await update_vtb_list() regularly
 import asyncio
 import json
+import os
 import httpx
 from pathlib import Path
 from typing import List, Union
@@ -41,18 +42,19 @@ async def update_vtb_list():
 
 
 def load_vtb_list() -> List[dict]:
-    if vtb_list_path.exists():
-        with vtb_list_path.open("r", encoding="utf-8") as f:
+    if Path(vtb_list_path).exists():
+        with open(vtb_list_path,
+                        "r", encoding="utf-8") as f:
             try:
                 return json.load(f)
             except json.decoder.JSONDecodeError:
-                logger.warning("vtb列表解析错误，将重新获取")
-                vtb_list_path.unlink()
+                print("vtb列表解析错误，将重新获取")
+                os.remove(vtb_list_path)
     return []
 
 
 def dump_vtb_list(vtb_list: List[dict]):
-    fp = vtb_list_path.open("w");
+    fp = open(vtb_list_path, "w")
     json.dump(vtb_list, fp, encoding="utf-8",
         indent=4,
         separators=(",", ": "),
