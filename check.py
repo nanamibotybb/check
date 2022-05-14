@@ -55,7 +55,7 @@ def load_vtb_list() -> List[dict]:
 
 def dump_vtb_list(vtb_list: List[dict]):
     fp = open(vtb_list_path, "w")
-    json.dump(vtb_list, fp, encoding="utf-8",
+    json.dump(vtb_list, fp, 
         indent=4,
         separators=(",", ": "),
         ensure_ascii=False,
