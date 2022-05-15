@@ -55,6 +55,7 @@ async def get_uid_by_name(name: str) -> int:
         for user in result["data"]["result"]:
             if user["uname"] == name:
                 return user["mid"]
+        print(name)
         return 0
     except Exception as e:
         print(f"Error in get_uid_by_name({name}): {e}")
@@ -71,7 +72,10 @@ async def get_user_info(uid: int, cache_at) -> dict:
             try:
                 with open(cache_at + '.card.json', 'w') as f:
                     f.write(resp)
-            except:
+            except Exception as e:
+                print('Err:')
+                print(e)
+                print(cache_at)
                 pass
 
         result = json.loads(resp)
@@ -153,7 +157,10 @@ async def get_reply(name: str, cache_at): # -> Union[str, bytes]:
         try:
             with open(cache_at + '.res.json', 'w') as f:
                 f.write(json.dumps(res, indent=4, ensure_ascii=False))
-        except:
+        except Exception as e:
+            print('Err:')
+            print(e)
+            print(cache_at)
             pass
 
     s = 'check/' + res['name'] + '\n'
@@ -176,7 +183,7 @@ if __name__ == '__main__':
         vtb_list_path = HOME + '/check/' + vtb_list_path
 
     try:
-        cache_at = sys.argv[2]
+        cache_at = os.path.expanduser(sys.argv[2])
     except:
         cache_at = None
 
