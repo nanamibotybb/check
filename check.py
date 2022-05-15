@@ -61,11 +61,19 @@ async def get_uid_by_name(name: str) -> int:
         return 0
 
 
-async def get_user_info(uid: int) -> dict:
+async def get_user_info(uid: int, cache_at) -> dict:
     try:
         url = "https://account.bilibili.com/api/member/getCardByMid"
         params = urllib.parse.urlencode({"mid": uid})
         resp = wget(url + '?' + params)
+
+        if cache_at:
+            try:
+                with open(cache_at + '.card.json', 'w') as f:
+                    f.write(resp)
+            except:
+                pass
+
         result = json.loads(resp)
         return result["card"]
     except Exception as e:
@@ -106,12 +114,12 @@ def format_vtb_info(info: dict, medal_dict: dict) -> dict:
     return {"name": name, "uid": uid, "medal": medal}
 
 
-async def get_reply(name: str): # -> Union[str, bytes]:
+async def get_reply(name: str, cache_at): # -> Union[str, bytes]:
     if name.isdigit():
         uid = int(name)
     else:
         uid = await get_uid_by_name(name)
-    user_info = await get_user_info(uid)
+    user_info = await get_user_info(uid, cache_at)
     if not user_info:
         return "获取用户信息失败，请检查名称或稍后再试"
 
@@ -141,6 +149,13 @@ async def get_reply(name: str): # -> Union[str, bytes]:
         "vtbs": vtbs,
     }
 
+    if cache_at:
+        try:
+            with open(cache_at + '.res.json', 'w') as f:
+                f.write(json.dumps(res, indent=4, ensure_ascii=False))
+        except:
+            pass
+
     s = 'check/' + res['name'] + '\n'
     s += '-----------------------------\n'
     s += '\n'.join(sorted([i['name'] + ((' (' + str(i['medal'] + ') ')) if i['medal'] else '') for i in res['vtbs']]))
@@ -161,6 +176,11 @@ if __name__ == '__main__':
         vtb_list_path = HOME + '/check/' + vtb_list_path
 
     try:
-        print(asyncio.run(get_reply(sys.argv[1])))
+        cache_at = sys.argv[2]
     except:
-        print(asyncio.get_event_loop().run_until_complete(get_reply(sys.argv[1])))
+        cache_at = None
+
+    try:
+        print(asyncio.run(get_reply(sys.argv[1], cache_at)))
+    except:
+        print(asyncio.get_event_loop().run_until_complete(get_reply(sys.argv[1], cache_at)))
