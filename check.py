@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import os.path
@@ -9,15 +8,10 @@ from pathlib import Path
 import urllib.parse
 import urllib.request
 
-bilibili_cookie = None
-
-
 vtb_list_path = "vtb_list.json"
 
-def wget(url, cookies=None):
+def wget(url):
     req = urllib.request.Request(url=url)
-    if cookies:
-        req.add_header('cookie', cookies)
     with urllib.request.urlopen(req) as f:
         return f.read().decode('utf-8')
 
@@ -34,35 +28,7 @@ def load_vtb_list(): # -> List[dict]:
     return []
 
 
-def dump_vtb_list(vtb_list: List[dict]):
-    fp = open(vtb_list_path, "w")
-    json.dump(vtb_list, fp, 
-        indent=4,
-        separators=(",", ": "),
-        ensure_ascii=False,
-    )
-    fp.close()
-
-
-
-async def get_uid_by_name(name: str) -> int:
-    try:
-        url = "http://api.bilibili.com/x/web-interface/search/type"
-        params = urllib.parse.urlencode({"search_type": "bili_user", "keyword": name})
-            
-        resp = wget(url + '?' + params)
-        result = json.loads(resp)
-        for user in result["data"]["result"]:
-            if user["uname"] == name:
-                return user["mid"]
-        print(name)
-        return 0
-    except Exception as e:
-        print(f"Error in get_uid_by_name({name}): {e}")
-        return 0
-
-
-async def get_user_info(uid: int, cache_at) -> dict:
+def get_user_info(uid: int, cache_at) -> dict:
     try:
         url = "https://account.bilibili.com/api/member/getCardByMid"
         params = urllib.parse.urlencode({"mid": uid})
@@ -84,21 +50,6 @@ async def get_user_info(uid: int, cache_at) -> dict:
         print(f"Error in get_user_info({uid}): {e}")
         return {}
 
-
-async def get_medals(uid: int) -> List[dict]:
-    if not bilibili_cookie:
-        return []
-
-    try:
-        url = "https://api.live.bilibili.com/xlive/web-ucenter/user/MedalWall"
-        params = urllib.parse.urlencode({"target_id": uid})
-        resp = wget(url + '?' + params,
-                        bilibili_cookie)
-        result = json.loads(resp)
-        return result["data"]["list"]
-    except Exception as e:
-        print(f"Error in get_medals({uid}): {e}")
-        return []
 
 
 
@@ -170,24 +121,14 @@ async def get_reply(name: str, cache_at): # -> Union[str, bytes]:
 
 
 if __name__ == '__main__':
-    # asyncio.run(update_vtb_list())
-
-    p = Path('~/etc/bilibili-cookies')
-    if p.exists():
-            with p.open('r') as f:
-                    bilibili_cookie = f.read()
-
-    HOME = os.path.expanduser('~')
     p = Path(vtb_list_path)
     if not p.exists():
-        vtb_list_path = HOME + '/check/' + vtb_list_path
+        vtb_list_path = '~/check/' + vtb_list_path
+        vtb_list_path = os.path.expanduser(vtb_list_path)
 
     try:
         cache_at = os.path.expanduser(sys.argv[2])
     except:
         cache_at = None
 
-    try:
-        print(asyncio.run(get_reply(sys.argv[1], cache_at)))
-    except:
-        print(asyncio.get_event_loop().run_until_complete(get_reply(sys.argv[1], cache_at)))
+    print(get_reply(sys.argv[1], cache_at))

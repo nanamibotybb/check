@@ -1,5 +1,16 @@
 vtb_list_path = "vtb_list.json"
 
+
+def dump_vtb_list(vtb_list: List[dict]):
+    fp = open(vtb_list_path, "w")
+    json.dump(vtb_list, fp, 
+        indent=4,
+        separators=(",", ": "),
+        ensure_ascii=False,
+    )
+    fp.close()
+
+
 async def update_vtb_list():
     msg = "成分姬：自动更新vtb列表失败"
     vtb_list = load_vtb_list()

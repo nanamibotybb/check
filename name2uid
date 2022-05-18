@@ -1,0 +1,9 @@
+#!/bin/sh
+
+NAME=$1
+CACHE=cache.name2uid/$NAME
+
+[ -e $CACHE ] || timeout 10 curl "http://api.bilibili.com/x/web-interface/search/type?search_type=bili_user&keyword=$1" > $CACHE
+
+./name2uid-parse $CACHE
+

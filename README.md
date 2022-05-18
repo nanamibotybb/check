@@ -9,8 +9,6 @@ forked from hoshinobot-plugin-ddcheck (Hoshinobot 成分姬插件)
 VTB列表数据来源：[vtbs.moe](https://vtbs.moe/)
 
 
-若要显示主播牌子，需要添加B站用户cookie.
-
 ### 示例
 
 <div align="left">
